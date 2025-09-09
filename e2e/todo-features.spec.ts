@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test'
 
 test.describe('헬스케어 B2B 플랫폼 - TODO 기능 테스트', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/demo')
+    await page.goto('/')
+    // 데모 모드로 자동 리다이렉트 대기
+    await page.waitForURL('**/demo', { timeout: 5000 })
   })
 
   test.describe('2. 비딩 요청 (Bidding Request)', () => {

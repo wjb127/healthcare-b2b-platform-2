@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/database.types'
 
-type DemoUser = Database['public']['Tables']['users']['Row']
+export type DemoUser = Database['public']['Tables']['users']['Row']
 
 export class DemoSession {
   private static STORAGE_KEY = 'demo_user'

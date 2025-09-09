@@ -44,7 +44,7 @@ export default function NewProjectPage() {
           ...formData,
           user_id: user.id,
           status: 'open',
-        })
+        } as any)
         .select()
         .single()
 

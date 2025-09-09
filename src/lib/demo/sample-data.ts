@@ -111,7 +111,9 @@ export const SAMPLE_NOTIFICATIONS = [
   }
 ]
 
-export async function generateSampleData(supabase: any, userId: string, role: 'buyer' | 'supplier') {
+import { SupabaseClient } from '@supabase/supabase-js'
+
+export async function generateSampleData(supabase: SupabaseClient, userId: string, role: 'buyer' | 'supplier') {
   try {
     if (role === 'buyer') {
       // Create sample projects for buyer

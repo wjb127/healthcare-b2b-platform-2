@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card'
 import { Bell, Calendar, MapPin, DollarSign, Clock, TrendingUp, FileText, Award } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { Database } from '@/lib/database.types'
+import type { DemoUser } from '@/lib/demo/session'
 
 type Project = Database['public']['Tables']['projects']['Row'] & {
   user?: { company_name: string }
@@ -18,7 +19,7 @@ type Bid = Database['public']['Tables']['bids']['Row']
 
 export default function SupplierDashboard() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<DemoUser | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
   const [myBids, setMyBids] = useState<Bid[]>([])
   const [stats, setStats] = useState({
@@ -44,7 +45,7 @@ export default function SupplierDashboard() {
       const supabase = createClient()
       
       // Fetch all open projects
-      const { data: projectsData, error } = await supabase
+      const { data: projectsData } = await supabase
         .from('projects')
         .select(`
           *,

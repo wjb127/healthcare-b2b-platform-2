@@ -9,13 +9,14 @@ import { Card } from '@/components/ui/card'
 import { Plus, FileText, Bell, TrendingUp, Calendar, MapPin, DollarSign } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { Database } from '@/lib/database.types'
+import type { DemoUser } from '@/lib/demo/session'
 
 type Project = Database['public']['Tables']['projects']['Row']
-type Bid = Database['public']['Tables']['bids']['Row']
+// type Bid = Database['public']['Tables']['bids']['Row'] - unused
 
 export default function BuyerDashboard() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<DemoUser | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
   const [stats, setStats] = useState({
     totalProjects: 0,
@@ -38,17 +39,17 @@ export default function BuyerDashboard() {
       
       // Fetch projects
       const supabase = createClient()
-      const { data: projectsData, error } = await supabase
+      const { data: projectsData } = await supabase
         .from('projects')
         .select('*')
         .eq('user_id', demoUser.id)
         .order('created_at', { ascending: false })
       
       if (projectsData) {
-        setProjects(projectsData)
+        setProjects(projectsData as Project[])
         
         // Calculate stats
-        const activeCount = projectsData.filter(p => p.status === 'open').length
+        const activeCount = projectsData.filter((p: Project) => p.status === 'open').length
         setStats({
           totalProjects: projectsData.length,
           activeProjects: activeCount,
@@ -60,7 +61,7 @@ export default function BuyerDashboard() {
         const { data: bidsData } = await supabase
           .from('bids')
           .select('project_id')
-          .in('project_id', projectsData.map(p => p.id))
+          .in('project_id', projectsData.map((p: Project) => p.id))
         
         if (bidsData) {
           setStats(prev => ({
