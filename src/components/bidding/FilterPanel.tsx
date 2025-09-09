@@ -18,8 +18,6 @@ import {
   Filter,
   Calendar,
   Download,
-  FileSpreadsheet,
-  FileText,
 } from "lucide-react";
 
 interface FilterPanelProps {

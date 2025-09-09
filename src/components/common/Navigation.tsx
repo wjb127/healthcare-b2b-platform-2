@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Home, FileText, TrendingUp, Users, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,26 +21,26 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">HB</span>
             </div>
             <span className="font-semibold text-slate-900 text-lg">
               Healthcare B2B
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className="flex items-center gap-2 text-slate-600 hover:text-teal-600 transition-colors"
               >
                 <item.icon className="h-4 w-4" />
                 <span className="font-medium">{item.label}</span>
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -76,7 +77,7 @@ export default function Navigation() {
             <div className="container mx-auto px-4 py-4">
               <div className="flex flex-col gap-2">
                 {navItems.map((item) => (
-                  <a
+                  <Link
                     key={item.href}
                     href={item.href}
                     className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition-colors"
@@ -84,7 +85,7 @@ export default function Navigation() {
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="font-medium">{item.label}</span>
-                  </a>
+                  </Link>
                 ))}
                 <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-200">
                   <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:bg-slate-50">

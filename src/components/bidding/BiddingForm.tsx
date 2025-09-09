@@ -54,8 +54,6 @@ export default function BiddingForm() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentScore, setCurrentScore] = useState(0);
-  const [scoringWeights, setScoringWeights] = useState<Record<string, number>>({});
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: "",
     status: "all",
@@ -216,7 +214,7 @@ export default function BiddingForm() {
   };
 
   const getStatusBadge = (status: BidStatus) => {
-    const statusConfig = {
+    const statusConfig: Record<BidStatus, { label: string; className: string; icon?: React.ElementType }> = {
       submitted: {
         label: "제출됨",
         className: "bg-teal-300/30 text-teal-700 border-teal-300/50",
@@ -281,7 +279,7 @@ export default function BiddingForm() {
     // Export logic here
     console.log(`Exporting as ${format}...`);
     // In a real app, you would generate the file and download it
-    const data = filteredBids.map(bid => ({
+    filteredBids.map(bid => ({
       "응찰번호": bid.id,
       "제품명": bid.productName,
       "회사명": bid.companyName,
@@ -341,9 +339,8 @@ export default function BiddingForm() {
     return `${diffDays}일 남음`;
   };
 
-  const handleScoreChange = (score: number, weights: Record<string, number>) => {
-    setCurrentScore(score);
-    setScoringWeights(weights);
+  const handleScoreChange = (score: number) => {
+    console.log('Score changed:', score);
   };
 
   // Sample bid data for scoring demonstration
