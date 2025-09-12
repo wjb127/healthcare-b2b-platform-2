@@ -2,20 +2,39 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { DemoSession } from '@/lib/demo/session'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowLeft, Calendar, MapPin, DollarSign, Upload, X, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
-import type { Database } from '@/lib/database.types'
 
-type Project = Database['public']['Tables']['projects']['Row'] & {
+type Project = {
+  id: string
+  title: string
+  category: string
+  budget: number
+  budget_range?: string
+  deadline: string
+  status: string
+  bids_count: number
+  requirements?: string
+  region?: string
+  created_at: string
   user?: { company_name: string }
+  user_id?: string
 }
-type Bid = Database['public']['Tables']['bids']['Row']
+
+type Bid = {
+  id: string
+  project_id: string
+  supplier_id: string
+  price: number
+  delivery_days: number
+  comment: string
+  status: string
+  created_at: string
+}
 
 export default function BidSubmitPage() {
   const router = useRouter()
@@ -36,45 +55,61 @@ export default function BidSubmitPage() {
 
   useEffect(() => {
     const fetchProjectData = async () => {
-      const user = DemoSession.getDemoUser()
-      if (!user || user.role !== 'supplier') {
+      // Check demo user from localStorage
+      const demoUserStr = localStorage.getItem('demo_user')
+      const demoRole = localStorage.getItem('demo_role')
+      
+      if (!demoUserStr || demoRole !== 'supplier') {
         router.push('/demo')
         return
       }
 
-      const supabase = createClient()
+      const demoUser = JSON.parse(demoUserStr)
       
-      // Fetch project details
-      const { data: projectData, error: projectError } = await supabase
-        .from('projects')
-        .select(`
-          *,
-          user:users(company_name)
-        `)
-        .eq('id', projectId)
-        .single()
-
-      if (projectError || !projectData) {
-        router.push('/dashboard/supplier')
-        return
+      // Get projects from localStorage
+      const projectsStr = localStorage.getItem('demo_projects')
+      const projects = projectsStr ? JSON.parse(projectsStr) : []
+      
+      // Find the specific project
+      const projectData = projects.find((p: Project) => p.id === projectId)
+      
+      // If not found in user's projects, check sample projects for supplier
+      if (!projectData) {
+        const sampleProject = {
+          id: projectId,
+          title: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? 'MRI 장비 구매' : '병원 정보시스템 구축',
+          category: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? 'medical_equipment' : 'software',
+          budget: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? 5000000000 : 2000000000,
+          budget_range: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? '50억원 이상' : '20억원 이상',
+          deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active',
+          bids_count: 3,
+          requirements: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' 
+            ? '최신 3T MRI 장비 도입을 계획하고 있습니다. 기술 지원 및 유지보수 포함.'
+            : 'EMR/PACS 통합 시스템 구축. 클라우드 기반 솔루션 선호.',
+          region: '서울',
+          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          user: { company_name: '서울대학교병원' },
+          user_id: 'buyer-demo-id'
+        }
+        setProject(sampleProject)
+      } else {
+        setProject(projectData)
       }
 
-      setProject(projectData as Project)
-
       // Check if already bidded
-      const { data: bidData } = await supabase
-        .from('bids')
-        .select('*')
-        .eq('project_id', projectId)
-        .eq('supplier_id', user.id)
-        .single()
+      const bidsStr = localStorage.getItem('demo_bids')
+      const bids = bidsStr ? JSON.parse(bidsStr) : []
+      const existingBidData = bids.find((b: Bid) => 
+        b.project_id === projectId && b.supplier_id === demoUser.id
+      )
 
-      if (bidData) {
-        setExistingBid(bidData)
+      if (existingBidData) {
+        setExistingBid(existingBidData)
         setFormData({
-          price: bidData.price?.toString() || '',
-          delivery_days: bidData.delivery_days?.toString() || '',
-          comment: bidData.comment || '',
+          price: existingBidData.price?.toString() || '',
+          delivery_days: existingBidData.delivery_days?.toString() || '',
+          comment: existingBidData.comment || '',
         })
       }
 
@@ -89,66 +124,74 @@ export default function BidSubmitPage() {
     setSubmitting(true)
 
     try {
-      const user = DemoSession.getDemoUser()
-      if (!user) {
+      // Get demo user from localStorage
+      const demoUserStr = localStorage.getItem('demo_user')
+      if (!demoUserStr) {
         router.push('/demo')
         return
       }
 
-      const supabase = createClient()
+      const demoUser = JSON.parse(demoUserStr)
       
-      const bidData = {
+      const bidData: Bid = {
+        id: existingBid?.id || `bid-${Date.now()}`,
         project_id: projectId,
-        supplier_id: user.id,
+        supplier_id: demoUser.id,
         price: parseFloat(formData.price),
         delivery_days: parseInt(formData.delivery_days),
         comment: formData.comment,
-        status: 'submitted' as const,
+        status: 'submitted',
+        created_at: new Date().toISOString(),
       }
+
+      // Get existing bids or initialize
+      const bidsStr = localStorage.getItem('demo_bids')
+      const bids = bidsStr ? JSON.parse(bidsStr) : []
 
       if (existingBid) {
         // Update existing bid
-        const { error } = await supabase
-          .from('bids')
-          .update(bidData)
-          .eq('id', existingBid.id)
-
-        if (error) throw error
+        const updatedBids = bids.map((b: Bid) => 
+          b.id === existingBid.id ? bidData : b
+        )
+        localStorage.setItem('demo_bids', JSON.stringify(updatedBids))
       } else {
         // Create new bid
-        const { data: newBid, error } = await supabase
-          .from('bids')
-          .insert(bidData)
-          .select()
-          .single()
+        localStorage.setItem('demo_bids', JSON.stringify([...bids, bidData]))
+        
+        // Update project bids count
+        const projectsStr = localStorage.getItem('demo_projects')
+        const projects = projectsStr ? JSON.parse(projectsStr) : []
+        const updatedProjects = projects.map((p: Project) => 
+          p.id === projectId ? { ...p, bids_count: (p.bids_count || 0) + 1 } : p
+        )
+        localStorage.setItem('demo_projects', JSON.stringify(updatedProjects))
 
-        if (error) throw error
-
-        // Upload files if any
-        if (newBid && files.length > 0) {
-          for (const file of files) {
-            await supabase
-              .from('bid_files')
-              .insert({
-                bid_id: newBid.id,
-                file_name: file.name,
-                file_url: `demo://${file.name}`, // Demo URL
-              })
-          }
+        // Store files metadata if any
+        if (files.length > 0) {
+          const bidFiles = files.map(file => ({
+            bid_id: bidData.id,
+            file_name: file.name,
+            file_url: `demo://${file.name}`,
+          }))
+          
+          const existingFilesStr = localStorage.getItem('demo_bid_files')
+          const existingFiles = existingFilesStr ? JSON.parse(existingFilesStr) : []
+          localStorage.setItem('demo_bid_files', JSON.stringify([...existingFiles, ...bidFiles]))
         }
 
         // Create notification for buyer
-        if (project?.user_id) {
-          await supabase
-            .from('notifications')
-            .insert({
-              user_id: project.user_id,
-              type: 'new_bid',
-              title: '새로운 응찰이 접수되었습니다',
-              message: `${user.company_name}에서 ${project.title} 프로젝트에 응찰했습니다.`,
-              read: false,
-            })
+        const notificationsStr = localStorage.getItem('demo_notifications')
+        const notifications = notificationsStr ? JSON.parse(notificationsStr) : []
+        const newNotification = {
+          id: `notif-${Date.now()}`,
+          user_id: project?.user_id || 'buyer-demo-id',
+          type: 'new_bid',
+          title: '새로운 응찰이 접수되었습니다',
+          message: `${demoUser.user_metadata.company_name}에서 ${project?.title} 프로젝트에 응찰했습니다.`,
+          read: false,
+          created_at: new Date().toISOString(),
         }
+        localStorage.setItem('demo_notifications', JSON.stringify([...notifications, newNotification]))
       }
 
       setSubmitted(true)

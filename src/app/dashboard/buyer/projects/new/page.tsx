@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { DemoSession } from '@/lib/demo/session'
+// Remove Supabase imports for demo mode
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -29,41 +28,50 @@ export default function NewProjectPage() {
     setLoading(true)
 
     try {
-      const user = DemoSession.getDemoUser()
-      if (!user) {
+      // Check demo user from localStorage
+      const demoUserStr = localStorage.getItem('demo_user')
+      if (!demoUserStr) {
         router.push('/demo')
         return
       }
 
-      const supabase = createClient()
+      const demoUser = JSON.parse(demoUserStr)
       
-      // Create project
-      const { data: project, error } = await supabase
-        .from('projects')
-        .insert({
-          ...formData,
-          user_id: user.id,
-          status: 'open',
-        } as any)
-        .select()
-        .single()
-
-      if (error) throw error
-
-      // Upload files if any
-      if (project && files.length > 0) {
-        for (const file of files) {
-          // In real implementation, would upload to Supabase Storage
-          await supabase
-            .from('project_files')
-            .insert({
-              project_id: project.id,
-              file_name: file.name,
-              file_size: file.size,
-              file_url: `demo://${file.name}`, // Demo URL
-            })
-        }
+      // Create new project
+      const newProject = {
+        id: `project-${Date.now()}`,
+        ...formData,
+        user_id: demoUser.id,
+        status: 'active',
+        bids_count: 0,
+        created_at: new Date().toISOString(),
+        budget: formData.budget_range ? parseInt(formData.budget_range.replace(/[^0-9]/g, '')) * 100000000 : 0,
       }
+
+      // Get existing projects or initialize
+      const existingProjectsStr = localStorage.getItem('demo_projects')
+      const existingProjects = existingProjectsStr ? JSON.parse(existingProjectsStr) : []
+      
+      // Add new project
+      const updatedProjects = [newProject, ...existingProjects]
+      localStorage.setItem('demo_projects', JSON.stringify(updatedProjects))
+
+      // Store files metadata if any
+      if (files.length > 0) {
+        const projectFiles = files.map(file => ({
+          project_id: newProject.id,
+          file_name: file.name,
+          file_size: file.size,
+          file_url: `demo://${file.name}`,
+        }))
+        
+        const existingFilesStr = localStorage.getItem('demo_project_files')
+        const existingFiles = existingFilesStr ? JSON.parse(existingFilesStr) : []
+        localStorage.setItem('demo_project_files', JSON.stringify([...existingFiles, ...projectFiles]))
+      }
+
+      // Add a small delay for UX
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       router.push('/dashboard/buyer')
     } catch (error) {

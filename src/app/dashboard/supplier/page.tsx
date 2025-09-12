@@ -2,20 +2,40 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { DemoSession } from '@/lib/demo/session'
+// Remove Supabase imports for demo mode
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Bell, Calendar, MapPin, DollarSign, Clock, TrendingUp, FileText, Award } from 'lucide-react'
 import { motion } from 'framer-motion'
-import type { Database } from '@/lib/database.types'
-import type { DemoUser } from '@/lib/demo/session'
-
-type Project = Database['public']['Tables']['projects']['Row'] & {
-  user?: { company_name: string }
-  _count?: { bids: number }
+type DemoUser = {
+  id: string
+  email: string
+  role: 'buyer' | 'supplier'
+  company_name: string
+  contact_name: string
 }
-type Bid = Database['public']['Tables']['bids']['Row']
+
+type Project = {
+  id: string
+  title: string
+  category: string
+  budget: number
+  budget_range?: string
+  deadline: string
+  status: string
+  bids_count: number
+  requirements?: string
+  region?: string
+  created_at: string
+  user?: { company_name: string }
+}
+
+type Bid = {
+  id: string
+  project_id: string
+  supplier_id: string
+  status: string
+}
 
 export default function SupplierDashboard() {
   const router = useRouter()
@@ -33,49 +53,90 @@ export default function SupplierDashboard() {
 
   useEffect(() => {
     const initDashboard = async () => {
-      // Check demo user
-      const demoUser = DemoSession.getDemoUser()
-      if (!demoUser || demoUser.role !== 'supplier') {
+      // Check demo user from localStorage
+      const demoUserStr = localStorage.getItem('demo_user')
+      const demoRole = localStorage.getItem('demo_role')
+      
+      if (!demoUserStr || demoRole !== 'supplier') {
         router.push('/demo')
         return
       }
       
-      setUser(demoUser)
+      const demoUser = JSON.parse(demoUserStr)
+      setUser({
+        id: demoUser.id,
+        email: demoUser.email,
+        role: demoUser.user_metadata.role,
+        company_name: demoUser.user_metadata.company_name,
+        contact_name: demoUser.user_metadata.name
+      })
       
-      const supabase = createClient()
-      
-      // Fetch all open projects
-      const { data: projectsData } = await supabase
-        .from('projects')
-        .select(`
-          *,
-          user:users(company_name)
-        `)
-        .eq('status', 'open')
-        .order('created_at', { ascending: false })
-      
-      if (projectsData) {
-        setProjects(projectsData as Project[])
-        
-        // Fetch my bids
-        const { data: bidsData } = await supabase
-          .from('bids')
-          .select('*')
-          .eq('supplier_id', demoUser.id)
-        
-        if (bidsData) {
-          setMyBids(bidsData)
-          
-          const wonCount = bidsData.filter(b => b.status === 'accepted').length
-          
-          setStats({
-            totalProjects: projectsData.length,
-            myBids: bidsData.length,
-            wonBids: wonCount,
-            avgCompetition: 3.2, // Mock average
-          })
+      // Create sample projects for supplier to see
+      const sampleProjects: Project[] = [
+        {
+          id: 'e2e4f063-d38b-4148-a15a-774b83ce74d0',
+          title: 'MRI 장비 구매',
+          category: 'medical_equipment',
+          budget: 5000000000,
+          budget_range: '50억원 이상',
+          deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active',
+          bids_count: 3,
+          requirements: '최신 3T MRI 장비 도입을 계획하고 있습니다. 기술 지원 및 유지보수 포함.',
+          region: '서울',
+          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          user: { company_name: '서울대학교병원' }
+        },
+        {
+          id: 'f3e5g074-e49c-5259-b26b-885c94df85e1',
+          title: '병원 정보시스템 구축',
+          category: 'software',
+          budget: 2000000000,
+          budget_range: '20억원 이상',
+          deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active',
+          bids_count: 5,
+          requirements: 'EMR/PACS 통합 시스템 구축. 클라우드 기반 솔루션 선호.',
+          region: '경기도',
+          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          user: { company_name: '분당서울대학교병원' }
+        },
+        {
+          id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          title: '의료용 로봇 시스템',
+          category: 'robotics',
+          budget: 8000000000,
+          budget_range: '80억원 이상',
+          deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active',
+          bids_count: 2,
+          requirements: '수술용 로봇 시스템 도입. 다빈치 시스템 또는 동급 제품.',
+          region: '인천',
+          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          user: { company_name: '연세대학교 세브란스병원' }
         }
-      }
+      ]
+      
+      setProjects(sampleProjects)
+      
+      // Mock bids data
+      const mockBids: Bid[] = [
+        {
+          id: 'bid-1',
+          project_id: 'e2e4f063-d38b-4148-a15a-774b83ce74d0',
+          supplier_id: demoUser.id,
+          status: 'pending'
+        }
+      ]
+      
+      setMyBids(mockBids)
+      
+      setStats({
+        totalProjects: sampleProjects.length,
+        myBids: mockBids.length,
+        wonBids: 0,
+        avgCompetition: 3.2,
+      })
       
       setLoading(false)
     }
@@ -124,15 +185,22 @@ export default function SupplierDashboard() {
               <p className="text-sm text-gray-500">{user?.company_name} | {user?.contact_name}</p>
             </div>
             <div className="flex items-center gap-4">
-              <button className="relative p-2 text-gray-400 hover:text-gray-500 notification-bell">
-                <Bell className="h-6 w-6" />
-                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative group">
+                <button className="relative p-2 text-gray-400 cursor-not-allowed notification-bell">
+                  <Bell className="h-6 w-6" />
+                  <span className="absolute top-0 right-0 h-2 w-2 bg-gray-300 rounded-full"></span>
+                </button>
+                <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                  알림 기능 준비 중
+                </span>
+              </div>
               <Button
-                onClick={() => router.push('/dashboard/supplier/bids')}
                 variant="outline"
+                className="border-gray-300 text-gray-400 cursor-not-allowed"
+                disabled
+                title="준비 중"
               >
-                내 응찰
+                내 응찰 관리
               </Button>
               <Button
                 onClick={() => router.push('/demo')}

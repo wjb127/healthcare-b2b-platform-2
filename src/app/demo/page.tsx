@@ -6,9 +6,7 @@ import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Building2, ShoppingCart, Loader2 } from 'lucide-react'
-import { DemoSession } from '@/lib/demo/session'
-import { createClient } from '@/lib/supabase/client'
-import { generateSampleData } from '@/lib/demo/sample-data'
+// Remove unused imports for now
 
 export default function DemoPage() {
   const router = useRouter()
@@ -18,12 +16,47 @@ export default function DemoPage() {
     setLoading(role)
     
     try {
-      // Create demo user
-      const demoUser = await DemoSession.createDemoUser(role)
+      // Create demo user in localStorage
+      const demoUser = {
+        id: `demo-${role}-${Date.now()}`,
+        email: `demo.${role}@healthcare.com`,
+        user_metadata: {
+          role: role,
+          company_name: role === 'buyer' ? '서울대학교병원' : '메디텍 코리아',
+          name: role === 'buyer' ? '김구매' : '이공급'
+        }
+      }
       
-      // Generate sample data for the demo user
-      const supabase = createClient()
-      await generateSampleData(supabase, demoUser.id, role)
+      // Store demo user in localStorage
+      localStorage.setItem('demo_user', JSON.stringify(demoUser))
+      localStorage.setItem('demo_role', role)
+      
+      // Generate sample data in localStorage
+      const sampleProjects = role === 'buyer' ? [
+        {
+          id: 'e2e4f063-d38b-4148-a15a-774b83ce74d0',
+          title: 'MRI 장비 구매',
+          category: 'medical_equipment',
+          budget: 5000000000,
+          deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active',
+          bids_count: 3
+        },
+        {
+          id: 'f3e5g074-e49c-5259-b26b-885c94df85e1',
+          title: '병원 정보시스템 구축',
+          category: 'software',
+          budget: 2000000000,
+          deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active',
+          bids_count: 5
+        }
+      ] : []
+      
+      localStorage.setItem('demo_projects', JSON.stringify(sampleProjects))
+      
+      // Add a small delay for UX
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       // Redirect to appropriate dashboard
       router.push(`/dashboard/${role}`)

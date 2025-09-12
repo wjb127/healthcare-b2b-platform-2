@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { 
   ArrowRight, 
   Building2, 
@@ -131,21 +132,27 @@ export default function HomePage() {
                 className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-6 text-lg"
                 onClick={() => router.push('/demo')}
               >
-                무료 체험하기
+                데모 체험하기
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8 py-6 text-lg border-2"
-                onClick={() => router.push('/demo')}
+                className="px-8 py-6 text-lg border-2 border-slate-300 text-slate-400 cursor-not-allowed"
+                disabled
+                title="준비 중"
               >
-                데모 보기
+                가격 안내 (준비 중)
               </Button>
             </div>
-            <p className="text-sm text-gray-500 mt-4">
-              신용카드 없이 바로 시작 • 30일 무료 체험
-            </p>
+            <div className="flex flex-col items-center gap-2 mt-4">
+              <p className="text-sm text-gray-500">
+                데모 모드로 바로 시작 • 로컬 데이터 저장
+              </p>
+              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+                프로토타입 버전
+              </Badge>
+            </div>
           </motion.div>
 
           {/* Category Pills */}
@@ -333,30 +340,31 @@ export default function HomePage() {
                 className="bg-white text-teal-600 hover:bg-gray-100 px-8 py-6 text-lg"
                 onClick={() => router.push('/demo')}
               >
-                무료 체험 시작
+                데모 시작하기
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg"
-                onClick={() => router.push('/demo')}
+                className="border-white/50 text-white/50 px-8 py-6 text-lg cursor-not-allowed"
+                disabled
+                title="준비 중"
               >
-                영업팀 문의
+                영업팀 문의 (준비 중)
               </Button>
             </div>
             <div className="mt-8 flex items-center justify-center gap-8 text-white/80">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5" />
-                <span>신용카드 불필요</span>
+                <span>데모 체험 가능</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5" />
-                <span>언제든 취소 가능</span>
+                <span>로컬 데이터 저장</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5" />
-                <span>24/7 고객 지원</span>
+                <span>실제 워크플로우 테스트</span>
               </div>
             </div>
           </motion.div>
