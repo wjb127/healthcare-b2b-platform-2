@@ -109,70 +109,64 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      {/* Hero Section with Isometric Image */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-white to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-              transition={{ duration: 0.8 }}
-              className="text-left"
-            >
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                의료기관과 공급업체를 잇는
-                <span className="text-teal-600 block mt-2">스마트 B2B 플랫폼</span>
-              </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                투명한 비딩 시스템과 실시간 비교 분석으로 
-                최적의 의료 장비와 서비스를 만나보세요
+      {/* Hero Section with Background Image */}
+      <section className="relative min-h-[700px] overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/u8164484915_Healthcare_B2B_platform_landing_hero_isometric_3D_555f6a17-10cc-4ffc-aab0-62c9520424ad_1.png"
+            alt="Healthcare B2B Platform 3D Visualization"
+            fill
+            className="object-cover opacity-30"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/80 to-white/95" />
+        </div>
+        
+        {/* Content */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
+              의료기관과 공급업체를 잇는
+              <span className="text-teal-600 block mt-2">스마트 B2B 플랫폼</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto">
+              투명한 비딩 시스템과 실시간 비교 분석으로 
+              최적의 의료 장비와 서비스를 만나보세요
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-white px-10 py-7 text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                onClick={() => router.push('/demo')}
+              >
+                데모 체험하기
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="px-10 py-7 text-lg border-2 bg-white/80 backdrop-blur-sm border-slate-300 text-slate-400 cursor-not-allowed"
+                disabled
+                title="준비 중"
+              >
+                가격 안내 (준비 중)
+              </Button>
+            </div>
+            <div className="flex flex-col items-center gap-2 mt-8">
+              <p className="text-sm text-gray-600 font-medium">
+                데모 모드로 바로 시작 • 로컬 데이터 저장
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
-                  onClick={() => router.push('/demo')}
-                >
-                  데모 체험하기
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="px-8 py-6 text-lg border-2 border-slate-300 text-slate-400 cursor-not-allowed"
-                  disabled
-                  title="준비 중"
-                >
-                  가격 안내 (준비 중)
-                </Button>
-              </div>
-              <div className="flex flex-col items-start gap-2 mt-6">
-                <p className="text-sm text-gray-500">
-                  데모 모드로 바로 시작 • 로컬 데이터 저장
-                </p>
-                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
-                  프로토타입 버전
-                </Badge>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0.9 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="relative h-[500px] w-full">
-                <Image
-                  src="/images/u8164484915_Healthcare_B2B_platform_landing_hero_isometric_3D_555f6a17-10cc-4ffc-aab0-62c9520424ad_1.png"
-                  alt="Healthcare B2B Platform 3D Visualization"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            </motion.div>
-          </div>
+              <Badge variant="outline" className="bg-yellow-50/90 backdrop-blur-sm text-yellow-700 border-yellow-300">
+                프로토타입 버전
+              </Badge>
+            </div>
+          </motion.div>
 
           {/* Category Pills */}
           <motion.div
