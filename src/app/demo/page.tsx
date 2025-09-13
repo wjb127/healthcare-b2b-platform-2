@@ -6,60 +6,32 @@ import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Building2, ShoppingCart, Loader2 } from 'lucide-react'
-// Remove unused imports for now
+import { useSupabase } from '@/hooks/useSupabase'
 
 export default function DemoPage() {
   const router = useRouter()
   const [loading, setLoading] = useState<'buyer' | 'supplier' | null>(null)
+  const { auth, isConfigured } = useSupabase()
 
   const handleRoleSelect = async (role: 'buyer' | 'supplier') => {
     setLoading(role)
     
     try {
-      // Create demo user in localStorage
-      const demoUser = {
-        id: `demo-${role}-${Date.now()}`,
-        email: `demo.${role}@healthcare.com`,
-        user_metadata: {
-          role: role,
-          company_name: role === 'buyer' ? '서울대학교병원' : '메디텍 코리아',
-          name: role === 'buyer' ? '김구매' : '이공급'
-        }
+      // Use demo mode with Supabase or localStorage
+      const demoUser = await auth.selectDemoUser(role)
+      
+      if (demoUser) {
+        // Store role for dashboard
+        localStorage.setItem('demo_role', role)
+        
+        // Add a small delay for UX
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Redirect to appropriate dashboard
+        router.push(`/dashboard/${role}`)
+      } else {
+        throw new Error('Failed to select demo user')
       }
-      
-      // Store demo user in localStorage
-      localStorage.setItem('demo_user', JSON.stringify(demoUser))
-      localStorage.setItem('demo_role', role)
-      
-      // Generate sample data in localStorage
-      const sampleProjects = role === 'buyer' ? [
-        {
-          id: 'e2e4f063-d38b-4148-a15a-774b83ce74d0',
-          title: 'MRI 장비 구매',
-          category: 'medical_equipment',
-          budget: 5000000000,
-          deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'active',
-          bids_count: 3
-        },
-        {
-          id: 'f3e5g074-e49c-5259-b26b-885c94df85e1',
-          title: '병원 정보시스템 구축',
-          category: 'software',
-          budget: 2000000000,
-          deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'active',
-          bids_count: 5
-        }
-      ] : []
-      
-      localStorage.setItem('demo_projects', JSON.stringify(sampleProjects))
-      
-      // Add a small delay for UX
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Redirect to appropriate dashboard
-      router.push(`/dashboard/${role}`)
     } catch (error) {
       console.error('Error starting demo:', error)
       setLoading(null)
@@ -170,8 +142,10 @@ export default function DemoPage() {
           className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
         >
           <p className="text-sm text-yellow-800 text-center">
-            💡 <strong>데모 모드:</strong> 모든 데이터는 테스트용이며, 24시간 후 자동 초기화됩니다.
-            언제든지 역할을 전환하여 다른 관점에서 체험할 수 있습니다.
+            💡 <strong>{isConfigured ? 'Supabase 연동됨' : '데모 모드'}:</strong> 
+            {isConfigured 
+              ? ' 실제 데이터베이스와 연동되어 있습니다. 로그인이 필요합니다.'
+              : ' 모든 데이터는 테스트용이며, 24시간 후 자동 초기화됩니다. 언제든지 역할을 전환하여 다른 관점에서 체험할 수 있습니다.'}
           </p>
         </motion.div>
       </motion.div>
