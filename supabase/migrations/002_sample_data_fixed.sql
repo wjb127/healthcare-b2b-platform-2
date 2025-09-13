@@ -2,20 +2,21 @@
 -- Run this after your existing tables are created
 
 -- Insert test users (buyers and suppliers)
+-- Note: auth_id can be NULL for test data or use gen_random_uuid()
 INSERT INTO users (email, auth_id, role, company_name, contact_name, created_at) VALUES
 -- Buyers (Hospitals)
-('buyer1@hospital.kr', 'auth_buyer_1', 'buyer', 'Seoul National Hospital', 'Kim Manager', NOW() - INTERVAL '3 months'),
-('buyer2@samsung.kr', 'auth_buyer_2', 'buyer', 'Samsung Medical Center', 'Lee Director', NOW() - INTERVAL '2 months'),
-('buyer3@yonsei.kr', 'auth_buyer_3', 'buyer', 'Yonsei Severance', 'Park Chief', NOW() - INTERVAL '6 months'),
+('buyer1@hospital.kr', gen_random_uuid(), 'buyer', 'Seoul National Hospital', 'Kim Manager', NOW() - INTERVAL '3 months'),
+('buyer2@samsung.kr', gen_random_uuid(), 'buyer', 'Samsung Medical Center', 'Lee Director', NOW() - INTERVAL '2 months'),
+('buyer3@yonsei.kr', gen_random_uuid(), 'buyer', 'Yonsei Severance', 'Park Chief', NOW() - INTERVAL '6 months'),
 
 -- Suppliers (Medical Equipment Companies)
-('supplier1@medtech.kr', 'auth_supplier_1', 'supplier', 'MedTech Solutions', 'Kang Sales', NOW() - INTERVAL '7 months'),
-('supplier2@biomedical.kr', 'auth_supplier_2', 'supplier', 'BioMedical Corp', 'Yoon Tech', NOW() - INTERVAL '8 months'),
-('supplier3@healthtech.kr', 'auth_supplier_3', 'supplier', 'HealthTech Korea', 'Cho Manager', NOW() - INTERVAL '4 months'),
+('supplier1@medtech.kr', gen_random_uuid(), 'supplier', 'MedTech Solutions', 'Kang Sales', NOW() - INTERVAL '7 months'),
+('supplier2@biomedical.kr', gen_random_uuid(), 'supplier', 'BioMedical Corp', 'Yoon Tech', NOW() - INTERVAL '8 months'),
+('supplier3@healthtech.kr', gen_random_uuid(), 'supplier', 'HealthTech Korea', 'Cho Manager', NOW() - INTERVAL '4 months'),
 
 -- Test accounts for easy login
-('buyer@demo.com', 'auth_demo_buyer', 'buyer', 'Demo Hospital', 'Test Buyer', NOW()),
-('supplier@demo.com', 'auth_demo_supplier', 'supplier', 'Demo Supplier', 'Test Supplier', NOW());
+('buyer@demo.com', gen_random_uuid(), 'buyer', 'Demo Hospital', 'Test Buyer', NOW()),
+('supplier@demo.com', gen_random_uuid(), 'supplier', 'Demo Supplier', 'Test Supplier', NOW());
 
 -- Insert sample projects
 INSERT INTO projects (title, category, budget_range, deadline, status, requirements, region, user_id) VALUES
