@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [role, setRole] = useState<'buyer' | 'supplier'>('buyer')
-
+  
   // Sign in form state
   const [signInEmail, setSignInEmail] = useState('')
   const [signInPassword, setSignInPassword] = useState('')
@@ -29,9 +29,17 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      // 개발 환경에서는 테스트 계정으로 처리
-      if (!isConfigured || process.env.NODE_ENV === 'development') {
-        // 테스트 계정
+      // 실제 Supabase 로그인 시도
+      try {
+        const result = await auth.signIn(signInEmail, signInPassword)
+        if (result) {
+          localStorage.setItem('auth_mode', 'production')
+          localStorage.setItem('user_role', role)
+          localStorage.setItem('user_email', signInEmail)
+          router.push(`/dashboard/${role}`)
+        }
+      } catch (supabaseError: any) {
+        // Supabase 로그인 실패 시 테스트 계정 확인
         const testAccounts = {
           buyer: { email: 'buyer@demo.com', password: 'demo1234' },
           supplier: { email: 'supplier@demo.com', password: 'demo1234' }
@@ -44,14 +52,8 @@ export default function LoginPage() {
           localStorage.setItem('user_email', signInEmail)
           router.push(`/dashboard/${role}`)
         } else {
-          setError('테스트 계정: ' + testAccounts[role].email)
+          setError(supabaseError.message || '로그인에 실패했습니다. 테스트 계정: ' + testAccounts[role].email)
         }
-      } else {
-        // 실제 Supabase 로그인
-        await auth.signIn(signInEmail, signInPassword)
-        localStorage.setItem('auth_mode', 'production')
-        const profile = await auth.getProfile()
-        router.push(`/dashboard/${profile?.role || role}`)
       }
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다.')
@@ -69,41 +71,6 @@ export default function LoginPage() {
     setSignInPassword(testAccounts[role].password)
   }
 
-  if (!isConfigured) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle>Supabase 설정 필요</CardTitle>
-            <CardDescription>
-              Supabase가 아직 설정되지 않았습니다.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                환경 변수를 설정한 후 다시 시도해주세요.
-                <br />
-                <code className="text-xs bg-gray-100 p-1 rounded mt-2 block">
-                  NEXT_PUBLIC_SUPABASE_URL
-                  <br />
-                  NEXT_PUBLIC_SUPABASE_ANON_KEY
-                </code>
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-          <CardFooter>
-            <Link href="/demo" className="w-full">
-              <Button className="w-full" variant="outline">
-                데모 모드로 체험하기
-              </Button>
-            </Link>
-          </CardFooter>
-        </Card>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 flex items-center justify-center p-4">

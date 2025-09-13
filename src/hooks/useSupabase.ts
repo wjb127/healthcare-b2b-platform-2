@@ -8,11 +8,20 @@ import { NotificationsService } from '@/services/notifications.service';
 
 // Check if Supabase is configured
 const isSupabaseConfigured = () => {
-  return !!(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_project_url'
-  );
+  // 클라이언트 사이드에서 환경 변수 체크
+  if (typeof window !== 'undefined') {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    return !!(
+      url &&
+      key &&
+      url !== 'your_supabase_project_url' &&
+      url !== 'https://placeholder.supabase.co' &&
+      url.includes('supabase.co')
+    );
+  }
+  return false;
 };
 
 export function useSupabase() {
@@ -112,18 +121,7 @@ export function useSupabase() {
       signIn: (email: string, password: string) => authService.signIn(email, password),
       signOut: () => authService.signOut(),
       getUser: () => authService.getUser(),
-      getProfile: async () => {
-        // For production mode, return a mock profile based on stored role
-        const userRole = localStorage.getItem('user_role');
-        const userEmail = localStorage.getItem('user_email');
-        return {
-          id: 'prod-' + Date.now(),
-          email: userEmail || 'user@example.com',
-          role: userRole || 'buyer',
-          company_name: 'Test Company',
-          contact_name: 'Test User'
-        };
-      },
+      getProfile: () => authService.getProfile(),
       selectDemoUser: (role: 'buyer' | 'supplier') => authService.selectDemoUser(role)
     },
     projects: projectsService,

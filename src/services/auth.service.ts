@@ -74,20 +74,56 @@ export class AuthService {
     localStorage.removeItem('demo_user_id')
   }
 
-  // 나중에 구현할 실제 인증 메서드들
+  // 실제 인증 메서드들
   async signUp(email: string, password: string, metadata: any) {
-    throw new Error('Sign up not implemented yet')
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata
+      }
+    })
+    
+    if (error) throw error
+    return data
   }
 
   async signIn(email: string, password: string) {
-    throw new Error('Sign in not implemented yet')
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+    
+    if (error) throw error
+    return data
   }
 
   async signOut() {
+    const { error } = await this.supabase.auth.signOut()
+    if (error) throw error
     this.clearDemoUser()
   }
 
   async getUser() {
-    return this.getDemoUser()
+    const { data: { user } } = await this.supabase.auth.getUser()
+    return user || this.getDemoUser()
+  }
+  
+  async getProfile() {
+    const { data: { user } } = await this.supabase.auth.getUser()
+    if (!user) return null
+    
+    const { data, error } = await this.supabase
+      .from('users')
+      .select('*')
+      .eq('auth_id', user.id)
+      .single()
+    
+    if (error) {
+      console.error('Error fetching profile:', error)
+      return null
+    }
+    
+    return data
   }
 }
