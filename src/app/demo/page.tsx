@@ -18,6 +18,9 @@ export default function DemoPage() {
     setLoading(role)
     
     try {
+      // Set auth mode to demo
+      localStorage.setItem('auth_mode', 'demo')
+      
       if (role === 'admin') {
         // Admin doesn't need user selection, just set role
         localStorage.setItem('demo_role', 'admin')

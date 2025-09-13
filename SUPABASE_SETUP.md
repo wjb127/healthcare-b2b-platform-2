@@ -1,4 +1,6 @@
-# Supabase 설정 가이드
+# Supabase 설정 가이드 (실사용 모드 전용)
+
+> **참고**: 데모 모드는 Supabase 설정이 필요 없습니다. 바로 사용 가능합니다!
 
 ## 1. Supabase 프로젝트 생성
 
@@ -14,8 +16,10 @@
 ### 방법 1: SQL Editor 사용 (권장)
 
 1. Supabase Dashboard > SQL Editor 접속
-2. `supabase/migrations/001_initial_schema.sql` 파일 내용 복사
-3. SQL Editor에 붙여넣기 후 실행
+2. 순서대로 실행:
+   1) `supabase/migrations/001_initial_schema.sql` - 테이블 생성
+   2) `supabase/migrations/002_sample_data.sql` - 샘플 데이터 추가
+3. SQL Editor에 각각 붙여넣기 후 실행
 
 ### 방법 2: Migration 파일 사용
 
@@ -102,15 +106,25 @@ npm run dev
 
 http://localhost:3000 접속
 
-## 8. 테스트
+## 8. 사용 방법
 
-### 데모 모드 (Supabase 미설정 시)
-- `/demo` 페이지에서 즉시 테스트 가능
-- localStorage 기반 데이터 저장
+### 🎮 데모 모드 (Supabase 불필요)
+- **접속**: 홈페이지 → "데모 체험하기" 버튼
+- **특징**:
+  - Supabase 연동 불필요
+  - 인증 과정 없음
+  - 로컬 스토리지만 사용
+  - 즉시 테스트 가능
+  - 역할 선택만으로 바로 시작
 
-### 실제 모드 (Supabase 설정 완료)
-- `/auth/login` 페이지에서 회원가입/로그인
-- 실제 데이터베이스 연동
+### 💼 실사용 모드 (Supabase 필요)
+- **접속**: 홈페이지 → "실사용 시작하기" 버튼
+- **특징**:
+  - Supabase 데이터베이스 연동
+  - 실제 인증 시스템
+  - 영구 데이터 저장
+  - 다중 사용자 지원
+  - 실시간 업데이트
 
 ## 문제 해결
 

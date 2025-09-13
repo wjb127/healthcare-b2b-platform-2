@@ -40,27 +40,45 @@ export default function BuyerDashboard() {
   useEffect(() => {
     const initDashboard = async () => {
       try {
-        // Get demo user
-        const demoUser = auth.getUser()
+        // Check auth mode
+        const authMode = localStorage.getItem('auth_mode') // 'demo' or 'production'
         const demoRole = localStorage.getItem('demo_role')
+        const userRole = localStorage.getItem('user_role')
         
-        if (!demoUser || demoRole !== 'buyer') {
-          router.push('/demo')
-          return
+        // Handle demo mode
+        if (authMode === 'demo' || !authMode) {
+          const demoUser = auth.getUser()
+          if (!demoUser || demoRole !== 'buyer') {
+            router.push('/demo')
+            return
+          }
+          setUser(demoUser)
+        } 
+        // Handle production mode
+        else if (authMode === 'production') {
+          if (userRole !== 'buyer') {
+            router.push('/auth/login')
+            return
+          }
+          // Get real user data from Supabase
+          const userData = await auth.getProfile()
+          if (!userData) {
+            router.push('/auth/login')
+            return
+          }
+          setUser(userData)
         }
         
-        setUser(demoUser)
-        
-        // Fetch projects from Supabase or localStorage
+        // Fetch projects based on mode
         let projectsData: Project[] = []
         
-        if (isConfigured) {
-          // Use Supabase
+        if (authMode === 'production' && isConfigured) {
+          // Use real Supabase data for production mode
           projectsData = await projectsService.getProjects({
-            user_id: demoUser.id
+            user_id: user?.id
           })
         } else {
-          // Use localStorage fallback
+          // Use demo data for demo mode
           const projectsStr = localStorage.getItem('demo_projects')
           projectsData = projectsStr ? JSON.parse(projectsStr) : []
         }

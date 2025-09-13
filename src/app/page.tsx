@@ -25,7 +25,9 @@ import {
   Stethoscope,
   Pill,
   Heart,
-  Brain
+  Brain,
+  Play,
+  LogIn
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -145,8 +147,16 @@ export default function HomePage() {
                 className="bg-teal-600 hover:bg-teal-700 text-white px-10 py-7 text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
                 onClick={() => router.push('/demo')}
               >
+                <Play className="mr-2 h-5 w-5" />
                 데모 체험하기
-                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-7 text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                onClick={() => router.push('/auth/login')}
+              >
+                <LogIn className="mr-2 h-5 w-5" />
+                실사용 시작하기
               </Button>
               <Button
                 size="lg"
@@ -159,11 +169,19 @@ export default function HomePage() {
               </Button>
             </div>
             <div className="flex flex-col items-center gap-2 mt-8">
-              <p className="text-sm text-gray-600 font-medium">
-                데모 모드로 바로 시작 • 로컬 데이터 저장
-              </p>
+              <div className="flex items-center gap-4 text-sm text-gray-600 font-medium">
+                <span className="flex items-center gap-1">
+                  <Play className="h-4 w-4" />
+                  데모: 로컬 저장
+                </span>
+                <span className="text-gray-400">|</span>
+                <span className="flex items-center gap-1">
+                  <Shield className="h-4 w-4" />
+                  실사용: Supabase DB
+                </span>
+              </div>
               <Badge variant="outline" className="bg-yellow-50/90 backdrop-blur-sm text-yellow-700 border-yellow-300">
-                프로토타입 버전
+                Beta Version 1.0
               </Badge>
             </div>
           </motion.div>
