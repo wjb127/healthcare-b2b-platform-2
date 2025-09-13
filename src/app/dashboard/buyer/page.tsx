@@ -131,16 +131,17 @@ export default function BuyerDashboard() {
 
   const getStatusBadge = (status: string | null) => {
     const statusStyles = {
+      active: 'bg-green-100 text-green-800',
       open: 'bg-green-100 text-green-800',
       closed: 'bg-gray-100 text-gray-800',
       awarded: 'bg-blue-100 text-blue-800',
     }
     
-    const displayStatus = status || 'open'
+    const displayStatus = status || 'active'
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[displayStatus as keyof typeof statusStyles] || statusStyles.open}`}>
-        {displayStatus === 'open' ? '진행중' : displayStatus === 'closed' ? '마감' : '낙찰완료'}
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[displayStatus as keyof typeof statusStyles] || statusStyles.active}`}>
+        {(displayStatus === 'open' || displayStatus === 'active') ? '진행중' : displayStatus === 'closed' ? '마감' : '낙찰완료'}
       </span>
     )
   }

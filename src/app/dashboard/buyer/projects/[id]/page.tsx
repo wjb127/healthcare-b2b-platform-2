@@ -123,6 +123,14 @@ export default function ProjectDetailPage() {
   }, [projectId, router, weights])
 
   const handleAwardBid = (bidId: string) => {
+    // Find the selected bid
+    const selectedBidData = bids.find(b => b.id === bidId)
+    const confirmMessage = `${selectedBidData?.supplier_name || '이 공급자'}를 낙찰자로 선정하시겠습니까?\n\n견적가: ₩${selectedBidData?.price?.toLocaleString()}\n납기: ${selectedBidData?.delivery_days}일`
+    
+    if (!confirm(confirmMessage)) {
+      return
+    }
+    
     // Update bid status
     const bidsStr = localStorage.getItem('demo_bids')
     const allBids = bidsStr ? JSON.parse(bidsStr) : []
@@ -143,6 +151,9 @@ export default function ProjectDetailPage() {
       p.id === projectId ? { ...p, status: 'awarded' } : p
     )
     localStorage.setItem('demo_projects', JSON.stringify(updatedProjects))
+    
+    // Show success message
+    alert(`낙찰이 완료되었습니다!\n\n낙찰자: ${selectedBidData?.supplier_name}`)
     
     // Refresh page
     window.location.reload()
