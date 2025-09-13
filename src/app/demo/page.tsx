@@ -5,32 +5,39 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Building2, ShoppingCart, Loader2 } from 'lucide-react'
+import { Building2, ShoppingCart, Loader2, Shield } from 'lucide-react'
 import { useSupabase } from '@/hooks/useSupabase'
 
 export default function DemoPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState<'buyer' | 'supplier' | null>(null)
+  const [loading, setLoading] = useState<'buyer' | 'supplier' | 'admin' | null>(null)
   const { auth, isConfigured } = useSupabase()
 
-  const handleRoleSelect = async (role: 'buyer' | 'supplier') => {
+  const handleRoleSelect = async (role: 'buyer' | 'supplier' | 'admin') => {
     setLoading(role)
     
     try {
-      // Use demo mode with Supabase or localStorage
-      const demoUser = await auth.selectDemoUser(role)
-      
-      if (demoUser) {
-        // Store role for dashboard
-        localStorage.setItem('demo_role', role)
-        
-        // Add a small delay for UX
+      if (role === 'admin') {
+        // Admin doesn't need user selection, just set role
+        localStorage.setItem('demo_role', 'admin')
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Redirect to appropriate dashboard
-        router.push(`/dashboard/${role}`)
+        router.push('/dashboard/admin')
       } else {
-        throw new Error('Failed to select demo user')
+        // Use demo mode with Supabase or localStorage
+        const demoUser = await auth.selectDemoUser(role)
+        
+        if (demoUser) {
+          // Store role for dashboard
+          localStorage.setItem('demo_role', role)
+          
+          // Add a small delay for UX
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
+          // Redirect to appropriate dashboard
+          router.push(`/dashboard/${role}`)
+        } else {
+          throw new Error('Failed to select demo user')
+        }
       }
     } catch (error) {
       console.error('Error starting demo:', error)
@@ -135,11 +142,58 @@ export default function DemoPage() {
           </Card>
         </div>
 
+        {/* Admin Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="col-span-2"
+        >
+          <Card className="p-6 hover:shadow-xl transition-shadow duration-300 border-2 hover:border-purple-500 bg-gradient-to-br from-purple-50 to-blue-50">
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <Shield className="w-10 h-10 text-white" />
+              </div>
+              
+              <h2 className="text-2xl font-semibold text-gray-900">
+                관리자 (Admin)
+              </h2>
+              
+              <p className="text-gray-600">
+                플랫폼 관리 · 데이터 분석
+              </p>
+              
+              <ul className="text-sm text-gray-500 space-y-2 text-left max-w-sm mx-auto">
+                <li>• 실시간 플랫폼 모니터링</li>
+                <li>• 매출 및 거래 분석</li>
+                <li>• 사용자 활동 추적</li>
+                <li>• AI 기반 인사이트</li>
+                <li>• 카테고리별 통계</li>
+              </ul>
+              
+              <Button
+                onClick={() => handleRoleSelect('admin')}
+                disabled={loading !== null}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              >
+                {loading === 'admin' ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    대시보드 준비 중...
+                  </>
+                ) : (
+                  '관리자 대시보드 보기'
+                )}
+              </Button>
+            </div>
+          </Card>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+          className="col-span-2 mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
         >
           <p className="text-sm text-yellow-800 text-center">
             💡 <strong>{isConfigured ? 'Supabase 연동됨' : '데모 모드'}:</strong> 
