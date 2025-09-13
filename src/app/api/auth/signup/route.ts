@@ -38,9 +38,8 @@ export async function POST(request: Request) {
             auth_id: authData.user.id,
             role,
             company_name,
-            contact_name,
-            is_demo: false,
-            is_verified: false // 이메일 인증 후 true로 변경
+            contact_name
+            // is_demo와 is_verified 컬럼 제거 (테이블에 없음)
           }
         ])
 
