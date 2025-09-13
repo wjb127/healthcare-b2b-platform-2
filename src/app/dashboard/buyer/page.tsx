@@ -41,7 +41,7 @@ export default function BuyerDashboard() {
     const initDashboard = async () => {
       try {
         // Get demo user
-        const demoUser = await auth.getUser()
+        const demoUser = auth.getUser()
         const demoRole = localStorage.getItem('demo_role')
         
         if (!demoUser || demoRole !== 'buyer') {

@@ -30,8 +30,8 @@ export function useSupabase() {
         signUp: async () => { throw new Error('Supabase not configured') },
         signIn: async () => { throw new Error('Supabase not configured') },
         signOut: async () => authService.clearDemoUser(),
-        getUser: async () => authService.getDemoUser(),
-        getProfile: async () => authService.getDemoUser(),
+        getUser: () => authService.getDemoUser(),
+        getProfile: () => authService.getDemoUser(),
         selectDemoUser: (role: 'buyer' | 'supplier') => authService.createLocalDemoUser(role)
       },
       projects: {
@@ -119,7 +119,7 @@ export function useAuth() {
           const profile = await auth.getProfile();
           setUser(profile);
         } else {
-          const demoUser = auth.getUser ? await auth.getUser() : null;
+          const demoUser = auth.getUser ? auth.getUser() : null;
           setUser(demoUser);
         }
       } catch (error) {
