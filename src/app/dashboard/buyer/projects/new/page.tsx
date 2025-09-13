@@ -28,20 +28,31 @@ export default function NewProjectPage() {
     setLoading(true)
 
     try {
-      // Check demo user from localStorage
-      const demoUserStr = localStorage.getItem('demo_user')
-      if (!demoUserStr) {
-        router.push('/demo')
-        return
+      // Check auth mode
+      const authMode = localStorage.getItem('auth_mode')
+      
+      let userId: string
+      if (authMode === 'production') {
+        // Production mode - use stored user info
+        const userRole = localStorage.getItem('user_role')
+        const userEmail = localStorage.getItem('user_email')
+        userId = 'prod-user-' + Date.now()
+      } else {
+        // Demo mode
+        const demoUserStr = localStorage.getItem('demo_user')
+        if (!demoUserStr) {
+          router.push('/demo')
+          return
+        }
+        const demoUser = JSON.parse(demoUserStr)
+        userId = demoUser.id
       }
-
-      const demoUser = JSON.parse(demoUserStr)
       
       // Create new project
       const newProject = {
         id: `project-${Date.now()}`,
         ...formData,
-        user_id: demoUser.id,
+        user_id: userId,
         status: 'active',
         bids_count: 0,
         created_at: new Date().toISOString(),

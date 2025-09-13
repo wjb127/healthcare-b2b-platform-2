@@ -21,11 +21,20 @@ export function useSupabase() {
   const [projectsService] = useState(() => new ProjectsService());
   const [bidsService] = useState(() => new BidsService());
   const [notificationsService] = useState(() => new NotificationsService());
+  
+  // Check if we're in demo mode
+  const [isDemo, setIsDemo] = useState(false);
+  
+  useEffect(() => {
+    const authMode = localStorage.getItem('auth_mode');
+    setIsDemo(authMode === 'demo' || !authMode);
+  }, []);
 
-  // Return demo mode services if Supabase is not configured
-  if (!isConfigured) {
+  // Return demo mode services if in demo mode OR Supabase is not configured
+  if (isDemo || !isConfigured) {
     return {
       isConfigured: false,
+      isDemo: true,
       auth: {
         signUp: async () => { throw new Error('Supabase not configured') },
         signIn: async () => { throw new Error('Supabase not configured') },
@@ -94,11 +103,27 @@ export function useSupabase() {
     };
   }
 
-  // Return actual Supabase services with demo mode support
+  // Return actual Supabase services for production mode
   return {
     isConfigured: true,
+    isDemo: false,
     auth: {
-      ...authService,
+      signUp: (email: string, password: string, metadata: any) => authService.signUp(email, password, metadata),
+      signIn: (email: string, password: string) => authService.signIn(email, password),
+      signOut: () => authService.signOut(),
+      getUser: () => authService.getUser(),
+      getProfile: async () => {
+        // For production mode, return a mock profile based on stored role
+        const userRole = localStorage.getItem('user_role');
+        const userEmail = localStorage.getItem('user_email');
+        return {
+          id: 'prod-' + Date.now(),
+          email: userEmail || 'user@example.com',
+          role: userRole || 'buyer',
+          company_name: 'Test Company',
+          contact_name: 'Test User'
+        };
+      },
       selectDemoUser: (role: 'buyer' | 'supplier') => authService.selectDemoUser(role)
     },
     projects: projectsService,

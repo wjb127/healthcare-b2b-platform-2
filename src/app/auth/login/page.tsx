@@ -41,6 +41,7 @@ export default function LoginPage() {
             signInPassword === testAccounts[role].password) {
           localStorage.setItem('auth_mode', 'production')
           localStorage.setItem('user_role', role)
+          localStorage.setItem('user_email', signInEmail)
           router.push(`/dashboard/${role}`)
         } else {
           setError('테스트 계정: ' + testAccounts[role].email)

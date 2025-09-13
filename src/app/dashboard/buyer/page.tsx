@@ -26,7 +26,7 @@ type Project = {
 
 export default function BuyerDashboard() {
   const router = useRouter()
-  const { auth, projects: projectsService, isConfigured } = useSupabase()
+  const { auth, projects: projectsService, isConfigured, isDemo } = useSupabase()
   const [user, setUser] = useState<any>(null)
   const [projects, setProjects] = useState<Project[]>([])
   const [stats, setStats] = useState({
@@ -36,17 +36,21 @@ export default function BuyerDashboard() {
     avgBidsPerProject: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
+    if (initialized) return // Prevent re-runs
+    
     const initDashboard = async () => {
       try {
         // Check auth mode
         const authMode = localStorage.getItem('auth_mode') // 'demo' or 'production'
+        const isDemoMode = authMode === 'demo' || !authMode
         const demoRole = localStorage.getItem('demo_role')
         const userRole = localStorage.getItem('user_role')
         
         // Handle demo mode
-        if (authMode === 'demo' || !authMode) {
+        if (isDemoMode) {
           const demoUser = auth.getUser()
           if (!demoUser || demoRole !== 'buyer') {
             router.push('/demo')
@@ -72,23 +76,39 @@ export default function BuyerDashboard() {
         // Fetch projects based on mode
         let projectsData: Project[] = []
         
-        if (authMode === 'production' && isConfigured) {
-          // Use real Supabase data for production mode
-          projectsData = await projectsService.getProjects({
-            user_id: user?.id
-          })
+        if (isDemoMode) {
+          // Use localStorage for demo mode
+          const projectsStr = localStorage.getItem('demo_projects')
+          projectsData = projectsStr ? JSON.parse(projectsStr) : []
         } else {
-          // Use demo data for demo mode
+          // For production mode, use localStorage for now
+          // Since Supabase is not fully configured yet
           const projectsStr = localStorage.getItem('demo_projects')
           projectsData = projectsStr ? JSON.parse(projectsStr) : []
         }
         
+        // Get bids and calculate bid counts
+        // Always use localStorage for now since Supabase is not fully configured
+        const bidsStr = localStorage.getItem('demo_bids')
+        const allBids = bidsStr ? JSON.parse(bidsStr) : []
+        
+        // Count bids per project
+        const bidsPerProject: Record<string, number> = {}
+        allBids.forEach((bid: any) => {
+          bidsPerProject[bid.project_id] = (bidsPerProject[bid.project_id] || 0) + 1
+        })
+        
+        // Update projects with bid counts
+        projectsData = projectsData.map(project => ({
+          ...project,
+          bids_count: bidsPerProject[project.id] || 0
+        }))
+        
         setProjects(projectsData)
         
         // Calculate stats
-        const activeCount = projectsData.filter((p: Project) => p.status === 'open').length
-        const totalBids = projectsData.reduce((sum: number, p: Project) => 
-          sum + (p.bids?.length || 0), 0)
+        const activeCount = projectsData.filter((p: Project) => p.status === 'open' || p.status === 'active').length
+        const totalBids = allBids.length
         
         setStats({
           totalProjects: projectsData.length,
@@ -102,11 +122,12 @@ export default function BuyerDashboard() {
         console.error('Error initializing dashboard:', error)
       } finally {
         setLoading(false)
+        setInitialized(true) // Mark as initialized
       }
     }
     
     initDashboard()
-  }, [router, auth, projectsService, isConfigured])
+  }, [initialized, router, auth])
 
   const getStatusBadge = (status: string | null) => {
     const statusStyles = {

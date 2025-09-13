@@ -79,12 +79,30 @@ export default function ProjectDetailPage() {
       const allBids = bidsStr ? JSON.parse(bidsStr) : []
       const projectBids = allBids.filter((b: Bid) => b.project_id === projectId)
       
-      // Add sample supplier names and calculate scores
-      const bidsWithDetails = projectBids.map((bid: Bid, index: number) => ({
-        ...bid,
-        supplier_name: `공급사 ${String.fromCharCode(65 + index)}`,
-        score: calculateScore(bid),
-      }))
+      // Add supplier names and calculate scores
+      const bidsWithDetails = projectBids.map((bid: Bid) => {
+        // Try to get supplier name from their demo user data
+        let supplierName = '공급사'
+        
+        // Get all demo users to find supplier name
+        const suppliersData = [
+          { id: bid.supplier_id, company_name: '메디칼솔루션(주)' },
+          { id: bid.supplier_id, company_name: '헬스케어테크(주)' },
+          { id: bid.supplier_id, company_name: '바이오메드(주)' }
+        ]
+        
+        // Use a default name pattern or actual company name if available
+        const supplierIndex = allBids.findIndex((b: Bid) => b.id === bid.id)
+        supplierName = supplierIndex < 3 
+          ? ['메디칼솔루션(주)', '헬스케어테크(주)', '바이오메드(주)'][supplierIndex] || `공급사 ${supplierIndex + 1}`
+          : `공급사 ${supplierIndex + 1}`
+        
+        return {
+          ...bid,
+          supplier_name: supplierName,
+          score: calculateScore(bid),
+        }
+      })
       
       setBids(bidsWithDetails)
       setLoading(false)

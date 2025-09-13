@@ -73,28 +73,12 @@ export default function BidSubmitPage() {
       // Find the specific project
       const projectData = projects.find((p: Project) => p.id === projectId)
       
-      // If not found in user's projects, check sample projects for supplier
-      if (!projectData) {
-        const sampleProject = {
-          id: projectId,
-          title: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? 'MRI 장비 구매' : '병원 정보시스템 구축',
-          category: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? 'medical_equipment' : 'software',
-          budget: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? 5000000000 : 2000000000,
-          budget_range: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' ? '50억원 이상' : '20억원 이상',
-          deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'active',
-          bids_count: 3,
-          requirements: projectId === 'e2e4f063-d38b-4148-a15a-774b83ce74d0' 
-            ? '최신 3T MRI 장비 도입을 계획하고 있습니다. 기술 지원 및 유지보수 포함.'
-            : 'EMR/PACS 통합 시스템 구축. 클라우드 기반 솔루션 선호.',
-          region: '서울',
-          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          user: { company_name: '서울대학교병원' },
-          user_id: 'buyer-demo-id'
-        }
-        setProject(sampleProject)
-      } else {
+      if (projectData) {
         setProject(projectData)
+      } else {
+        // Project not found, redirect back
+        router.push('/dashboard/supplier')
+        return
       }
 
       // Check if already bidded
@@ -187,7 +171,7 @@ export default function BidSubmitPage() {
           user_id: project?.user_id || 'buyer-demo-id',
           type: 'new_bid',
           title: '새로운 응찰이 접수되었습니다',
-          message: `${demoUser.user_metadata.company_name}에서 ${project?.title} 프로젝트에 응찰했습니다.`,
+          message: `${demoUser.company_name || '공급업체'}에서 ${project?.title} 프로젝트에 응찰했습니다.`,
           read: false,
           created_at: new Date().toISOString(),
         }
