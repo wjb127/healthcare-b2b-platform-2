@@ -6,10 +6,9 @@ import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle, Building2, ShoppingCart } from 'lucide-react'
 import { useSupabase } from '@/hooks/useSupabase'
 import Link from 'next/link'
 
@@ -18,18 +17,11 @@ export default function LoginPage() {
   const { auth, isConfigured } = useSupabase()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [role, setRole] = useState<'buyer' | 'supplier'>('buyer')
 
   // Sign in form state
   const [signInEmail, setSignInEmail] = useState('')
   const [signInPassword, setSignInPassword] = useState('')
-
-  // Sign up form state
-  const [signUpEmail, setSignUpEmail] = useState('')
-  const [signUpPassword, setSignUpPassword] = useState('')
-  const [companyName, setCompanyName] = useState('')
-  const [contactName, setContactName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [role, setRole] = useState<'buyer' | 'supplier' | 'both'>('buyer')
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,9 +29,29 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      await auth.signIn(signInEmail, signInPassword)
-      const profile = await auth.getProfile()
-      router.push(`/dashboard/${profile?.role || 'buyer'}`)
+      // 개발 환경에서는 테스트 계정으로 처리
+      if (!isConfigured || process.env.NODE_ENV === 'development') {
+        // 테스트 계정
+        const testAccounts = {
+          buyer: { email: 'buyer@demo.com', password: 'demo1234' },
+          supplier: { email: 'supplier@demo.com', password: 'demo1234' }
+        }
+        
+        if (signInEmail === testAccounts[role].email && 
+            signInPassword === testAccounts[role].password) {
+          localStorage.setItem('auth_mode', 'production')
+          localStorage.setItem('user_role', role)
+          router.push(`/dashboard/${role}`)
+        } else {
+          setError('테스트 계정: ' + testAccounts[role].email)
+        }
+      } else {
+        // 실제 Supabase 로그인
+        await auth.signIn(signInEmail, signInPassword)
+        localStorage.setItem('auth_mode', 'production')
+        const profile = await auth.getProfile()
+        router.push(`/dashboard/${profile?.role || role}`)
+      }
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다.')
     } finally {
@@ -47,31 +59,13 @@ export default function LoginPage() {
     }
   }
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    try {
-      await auth.signUp(signUpEmail, signUpPassword, {
-        company_name: companyName,
-        contact_name: contactName,
-        role,
-        phone
-      })
-      
-      // Show success message
-      setError(null)
-      alert('회원가입이 완료되었습니다. 이메일을 확인해주세요.')
-      
-      // Switch to sign in tab
-      const signInTab = document.querySelector('[value="signin"]') as HTMLButtonElement
-      signInTab?.click()
-    } catch (err: any) {
-      setError(err.message || '회원가입에 실패했습니다.')
-    } finally {
-      setLoading(false)
+  const fillTestAccount = () => {
+    const testAccounts = {
+      buyer: { email: 'buyer@demo.com', password: 'demo1234' },
+      supplier: { email: 'supplier@demo.com', password: 'demo1234' }
     }
+    setSignInEmail(testAccounts[role].email)
+    setSignInPassword(testAccounts[role].password)
   }
 
   if (!isConfigured) {
@@ -119,205 +113,127 @@ export default function LoginPage() {
         className="max-w-md w-full"
       >
         <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            메인으로
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Healthcare B2B Platform
+            로그인
           </h1>
           <p className="text-gray-600">
-            의료 기관과 공급사를 연결하는 스마트 플랫폼
+            실사용 모드 로그인
           </p>
         </div>
 
-        <Card>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">로그인</TabsTrigger>
-              <TabsTrigger value="signup">회원가입</TabsTrigger>
-            </TabsList>
+        <Card className="p-8">
+          {/* Role Selection */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <button
+              type="button"
+              onClick={() => setRole('buyer')}
+              className={`p-3 rounded-lg border-2 transition-all ${
+                role === 'buyer' 
+                  ? 'border-teal-500 bg-teal-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Building2 className={`h-6 w-6 mx-auto mb-1 ${
+                role === 'buyer' ? 'text-teal-600' : 'text-gray-400'
+              }`} />
+              <div className={`text-sm font-medium ${
+                role === 'buyer' ? 'text-teal-900' : 'text-gray-600'
+              }`}>
+                구매자
+              </div>
+            </button>
 
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn}>
-                <CardHeader>
-                  <CardTitle>로그인</CardTitle>
-                  <CardDescription>
-                    이메일과 비밀번호를 입력하세요
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">이메일</Label>
-                    <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="example@hospital.com"
-                      value={signInEmail}
-                      onChange={(e) => setSignInEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">비밀번호</Label>
-                    <Input
-                      id="signin-password"
-                      type="password"
-                      value={signInPassword}
-                      onChange={(e) => setSignInPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-2">
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        로그인 중...
-                      </>
-                    ) : (
-                      '로그인'
-                    )}
-                  </Button>
-                  <Link href="/demo" className="w-full">
-                    <Button type="button" variant="outline" className="w-full">
-                      데모 모드로 체험하기
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </form>
-            </TabsContent>
+            <button
+              type="button"
+              onClick={() => setRole('supplier')}
+              className={`p-3 rounded-lg border-2 transition-all ${
+                role === 'supplier' 
+                  ? 'border-blue-500 bg-blue-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <ShoppingCart className={`h-6 w-6 mx-auto mb-1 ${
+                role === 'supplier' ? 'text-blue-600' : 'text-gray-400'
+              }`} />
+              <div className={`text-sm font-medium ${
+                role === 'supplier' ? 'text-blue-900' : 'text-gray-600'
+              }`}>
+                공급자
+              </div>
+            </button>
+          </div>
 
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp}>
-                <CardHeader>
-                  <CardTitle>회원가입</CardTitle>
-                  <CardDescription>
-                    새 계정을 생성하세요
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="company-name">회사명</Label>
-                      <Input
-                        id="company-name"
-                        placeholder="서울대학교병원"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="contact-name">담당자명</Label>
-                      <Input
-                        id="contact-name"
-                        placeholder="홍길동"
-                        value={contactName}
-                        onChange={(e) => setContactName(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">이메일</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="example@hospital.com"
-                      value={signUpEmail}
-                      onChange={(e) => setSignUpEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">비밀번호</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      value={signUpPassword}
-                      onChange={(e) => setSignUpPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">연락처 (선택)</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="02-1234-5678"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>역할</Label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          value="buyer"
-                          checked={role === 'buyer'}
-                          onChange={(e) => setRole(e.target.value as 'buyer')}
-                          className="mr-2"
-                        />
-                        구매자
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          value="supplier"
-                          checked={role === 'supplier'}
-                          onChange={(e) => setRole(e.target.value as 'supplier')}
-                          className="mr-2"
-                        />
-                        공급자
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          value="both"
-                          checked={role === 'both'}
-                          onChange={(e) => setRole(e.target.value as 'both')}
-                          className="mr-2"
-                        />
-                        둘 다
-                      </label>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        회원가입 중...
-                      </>
-                    ) : (
-                      '회원가입'
-                    )}
-                  </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <form onSubmit={handleSignIn}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email">이메일</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={signInEmail}
+                  onChange={(e) => setSignInEmail(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="password">비밀번호</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={signInPassword}
+                  onChange={(e) => setSignInPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    로그인 중...
+                  </>
+                ) : (
+                  '로그인'
+                )}
+              </Button>
+
+              <button
+                type="button"
+                onClick={fillTestAccount}
+                className="w-full p-2 text-sm text-gray-600 hover:bg-gray-50 rounded"
+              >
+                🔑 테스트 계정 자동입력
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              계정이 없으신가요?{' '}
+              <Link href="/auth/signup" className="text-teal-600 hover:text-teal-700 font-medium">
+                회원가입
+              </Link>
+            </p>
+            <p className="text-sm text-gray-600">
+              또는{' '}
+              <Link href="/demo" className="text-teal-600 hover:text-teal-700 font-medium">
+                데모 모드로 체험
+              </Link>
+            </p>
+          </div>
         </Card>
       </motion.div>
     </div>
