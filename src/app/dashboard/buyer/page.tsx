@@ -207,7 +207,15 @@ export default function BuyerDashboard() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  router.push('/demo')
+                  const authMode = localStorage.getItem('auth_mode')
+                  if (authMode === 'production') {
+                    // In production mode, go to login page for role switch
+                    localStorage.clear()
+                    router.push('/auth/login')
+                  } else {
+                    // In demo mode, go to demo page for role switch
+                    router.push('/demo')
+                  }
                 }}
               >
                 역할 전환

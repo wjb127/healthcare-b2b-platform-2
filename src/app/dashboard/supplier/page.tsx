@@ -256,7 +256,17 @@ export default function SupplierDashboard() {
                 내 응찰 관리
               </Button>
               <Button
-                onClick={() => router.push('/demo')}
+                onClick={() => {
+                  const authMode = localStorage.getItem('auth_mode')
+                  if (authMode === 'production') {
+                    // In production mode, go to login page for role switch
+                    localStorage.clear()
+                    router.push('/auth/login')
+                  } else {
+                    // In demo mode, go to demo page for role switch
+                    router.push('/demo')
+                  }
+                }}
                 variant="outline"
               >
                 역할 전환
