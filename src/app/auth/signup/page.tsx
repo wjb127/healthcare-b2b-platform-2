@@ -30,13 +30,29 @@ export default function SignUpPage() {
     setError('')
 
     try {
-      // For development, just simulate success
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          role
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Sign up failed')
+      }
+
       setSuccess(true)
       setTimeout(() => {
         router.push('/auth/login')
-      }, 2000)
+      }, 3000)
     } catch (err: any) {
-      setError('Error occurred during signup')
+      setError(err.message || 'Error occurred during signup')
     } finally {
       setLoading(false)
     }
@@ -44,15 +60,22 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-white to-blue-50">
         <Card className="p-8 max-w-md w-full text-center">
           <div className="text-green-600 mb-4">
             <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold mb-2">Sign Up Complete!</h2>
-          <p className="text-gray-600">Redirecting to login page...</p>
+          <h2 className="text-2xl font-bold mb-2">회원가입 완료!</h2>
+          <p className="text-gray-600 mb-4">
+            가입하신 이메일로 확인 메일이 발송되었습니다.
+            <br />
+            이메일 확인 후 로그인해주세요.
+          </p>
+          <p className="text-sm text-gray-500">
+            3초 후 로그인 페이지로 이동합니다...
+          </p>
         </Card>
       </div>
     )
