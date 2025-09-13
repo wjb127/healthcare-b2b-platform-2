@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [role, setRole] = useState<'buyer' | 'supplier'>('buyer')
+  const [selectedSupplier, setSelectedSupplier] = useState<1 | 2>(1)
   
   // Sign in form state
   const [signInEmail, setSignInEmail] = useState('')
@@ -32,11 +33,17 @@ export default function LoginPage() {
       // 테스트 계정 먼저 확인
       const testAccounts = {
         buyer: { email: 'buyer@demo.com', password: 'demo1234' },
-        supplier: { email: 'supplier@demo.com', password: 'demo1234' }
+        supplier1: { email: 'supplier@demo.com', password: 'demo1234' },
+        supplier2: { email: 'supplier2@demo.com', password: 'demo1234' }
       }
       
-      if (signInEmail === testAccounts[role].email && 
-          signInPassword === testAccounts[role].password) {
+      const isTestAccount = (
+        (signInEmail === testAccounts.buyer.email && signInPassword === testAccounts.buyer.password && role === 'buyer') ||
+        (signInEmail === testAccounts.supplier1.email && signInPassword === testAccounts.supplier1.password && role === 'supplier') ||
+        (signInEmail === testAccounts.supplier2.email && signInPassword === testAccounts.supplier2.password && role === 'supplier')
+      )
+      
+      if (isTestAccount) {
         // 테스트 계정으로 로그인
         localStorage.setItem('auth_mode', 'demo')
         localStorage.setItem('demo_role', role)
@@ -44,12 +51,25 @@ export default function LoginPage() {
         localStorage.setItem('user_email', signInEmail)
         
         // 테스트 계정용 데모 사용자 생성
+        let companyName = '테스트병원'
+        let contactName = '김구매'
+        
+        if (role === 'supplier') {
+          if (signInEmail === 'supplier2@demo.com') {
+            companyName = '바이오메드(주)'
+            contactName = '박공급'
+          } else {
+            companyName = '메디칼솔루션(주)'
+            contactName = '이공급'
+          }
+        }
+        
         const demoUser = {
           id: `demo-${role}-${Date.now()}`,
           email: signInEmail,
           role: role,
-          company_name: role === 'buyer' ? '테스트병원' : '테스트공급사',
-          contact_name: role === 'buyer' ? '김구매' : '이공급'
+          company_name: companyName,
+          contact_name: contactName
         }
         localStorage.setItem('demo_user', JSON.stringify(demoUser))
         
@@ -79,10 +99,18 @@ export default function LoginPage() {
   const fillTestAccount = () => {
     const testAccounts = {
       buyer: { email: 'buyer@demo.com', password: 'demo1234' },
-      supplier: { email: 'supplier@demo.com', password: 'demo1234' }
+      supplier1: { email: 'supplier@demo.com', password: 'demo1234' },
+      supplier2: { email: 'supplier2@demo.com', password: 'demo1234' }
     }
-    setSignInEmail(testAccounts[role].email)
-    setSignInPassword(testAccounts[role].password)
+    
+    if (role === 'buyer') {
+      setSignInEmail(testAccounts.buyer.email)
+      setSignInPassword(testAccounts.buyer.password)
+    } else {
+      const supplierAccount = selectedSupplier === 1 ? testAccounts.supplier1 : testAccounts.supplier2
+      setSignInEmail(supplierAccount.email)
+      setSignInPassword(supplierAccount.password)
+    }
   }
 
 
@@ -149,6 +177,52 @@ export default function LoginPage() {
             </button>
           </div>
 
+          {/* Supplier Selection - Only show when supplier role is selected */}
+          {role === 'supplier' && (
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm font-medium text-blue-900 mb-3">공급자 선택</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedSupplier(1)}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    selectedSupplier === 1
+                      ? 'border-blue-500 bg-white'
+                      : 'border-gray-200 bg-gray-50'
+                  }`}
+                >
+                  <div className={`text-sm font-medium ${
+                    selectedSupplier === 1 ? 'text-blue-900' : 'text-gray-600'
+                  }`}>
+                    메디칼솔루션(주)
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    supplier@demo.com
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedSupplier(2)}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    selectedSupplier === 2
+                      ? 'border-blue-500 bg-white'
+                      : 'border-gray-200 bg-gray-50'
+                  }`}
+                >
+                  <div className={`text-sm font-medium ${
+                    selectedSupplier === 2 ? 'text-blue-900' : 'text-gray-600'
+                  }`}>
+                    바이오메드(주)
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    supplier2@demo.com
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSignIn}>
             <div className="space-y-4">
               <div>
@@ -199,7 +273,12 @@ export default function LoginPage() {
               >
                 🔑 테스트 계정 자동입력
                 <div className="text-xs text-gray-500 mt-1">
-                  {role === 'buyer' ? 'buyer@demo.com' : 'supplier@demo.com'} / demo1234
+                  {role === 'buyer' 
+                    ? 'buyer@demo.com' 
+                    : selectedSupplier === 1 
+                      ? 'supplier@demo.com' 
+                      : 'supplier2@demo.com'
+                  } / demo1234
                 </div>
               </button>
             </div>
