@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Plus, FileText, Bell, TrendingUp, Calendar, MapPin, DollarSign } from 'lucide-react'
@@ -128,9 +129,17 @@ export default function BuyerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Header with subtle medical background */}
+      <header className="relative bg-white shadow-sm border-b">
+        <div className="absolute inset-0 opacity-5">
+          <Image
+            src="/images/u8164484915_Minimal_hospital_lobby_architecture_terrazzo_floo_6ddbfd37-47c0-451c-afa9-26a04da3913f_3.png"
+            alt="Hospital Background"
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-xl font-semibold text-gray-900">
@@ -171,6 +180,25 @@ export default function BuyerDashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section with Medical Image */}
+        <div className="relative mb-8 rounded-xl overflow-hidden shadow-lg">
+          <div className="relative h-48">
+            <Image
+              src="/images/u8164484915_CT_scanner_room_cool_white_with_teal_accents_blin_05f4b4a8-276c-43c9-95b9-c23fc03fa154_0.png"
+              alt="Medical Equipment"
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-600/80 to-blue-600/80" />
+            <div className="absolute inset-0 flex items-center justify-center text-white">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold mb-2">의료장비 구매 플랫폼</h2>
+                <p className="text-lg">투명하고 효율적인 비딩 시스템</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <motion.div
@@ -178,7 +206,7 @@ export default function BuyerDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="p-6">
+            <Card className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">전체 프로젝트</p>
@@ -194,7 +222,7 @@ export default function BuyerDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="p-6">
+            <Card className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">진행중 프로젝트</p>
@@ -210,7 +238,7 @@ export default function BuyerDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="p-6">
+            <Card className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">총 입찰 수</p>
@@ -226,7 +254,7 @@ export default function BuyerDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="p-6">
+            <Card className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">평균 입찰</p>

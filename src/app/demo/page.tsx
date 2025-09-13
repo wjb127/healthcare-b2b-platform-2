@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -46,29 +47,41 @@ export default function DemoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl w-full"
-      >
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            헬스케어 B2B 플랫폼 데모
-          </h1>
-          <p className="text-lg text-gray-600">
-            로그인 없이 바로 체험해보세요. 역할을 선택하면 즉시 시작됩니다.
-          </p>
-        </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background with medical image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/u8164484915_Healthcare_B2B_platform_landing_hero_isometric_3D_555f6a17-10cc-4ffc-aab0-62c9520424ad_1.png"
+          alt="Healthcare Platform Background"
+          fill
+          className="object-cover opacity-10"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-50/90 via-white/95 to-blue-50/90" />
+      </div>
+      
+      <div className="relative flex items-center justify-center min-h-screen p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl w-full"
+        >
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              헬스케어 B2B 플랫폼 데모
+            </h1>
+            <p className="text-lg text-gray-600">
+              로그인 없이 바로 체험해보세요. 역할을 선택하면 즉시 시작됩니다.
+            </p>
+          </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Buyer Card */}
-          <Card className="p-6 hover:shadow-xl transition-shadow duration-300 border-2 hover:border-teal-500">
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto">
-                <Building2 className="w-10 h-10 text-teal-600" />
-              </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Buyer Card */}
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 hover:border-teal-500 bg-white/95 backdrop-blur-sm">
+              <div className="text-center space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-teal-200 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                  <Building2 className="w-10 h-10 text-teal-600" />
+                </div>
               
               <h2 className="text-2xl font-semibold text-gray-900">
                 구매자 (Buyer)
@@ -102,12 +115,12 @@ export default function DemoPage() {
             </div>
           </Card>
 
-          {/* Supplier Card */}
-          <Card className="p-6 hover:shadow-xl transition-shadow duration-300 border-2 hover:border-blue-500">
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                <ShoppingCart className="w-10 h-10 text-blue-600" />
-              </div>
+            {/* Supplier Card */}
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-500 bg-white/95 backdrop-blur-sm">
+              <div className="text-center space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                  <ShoppingCart className="w-10 h-10 text-blue-600" />
+                </div>
               
               <h2 className="text-2xl font-semibold text-gray-900">
                 공급자 (Supplier)
@@ -140,20 +153,20 @@ export default function DemoPage() {
               </Button>
             </div>
           </Card>
-        </div>
+          </div>
 
-        {/* Admin Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="col-span-2"
-        >
-          <Card className="p-6 hover:shadow-xl transition-shadow duration-300 border-2 hover:border-purple-500 bg-gradient-to-br from-purple-50 to-blue-50">
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                <Shield className="w-10 h-10 text-white" />
-              </div>
+          {/* Admin Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="col-span-2 mt-6"
+          >
+            <Card className="p-6 hover:shadow-2xl transition-all duration-300 border-2 hover:border-purple-500 bg-gradient-to-br from-purple-50/95 to-blue-50/95 backdrop-blur-sm">
+              <div className="text-center space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-xl">
+                  <Shield className="w-10 h-10 text-white" />
+                </div>
               
               <h2 className="text-2xl font-semibold text-gray-900">
                 관리자 (Admin)
@@ -189,20 +202,21 @@ export default function DemoPage() {
           </Card>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="col-span-2 mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
-        >
-          <p className="text-sm text-yellow-800 text-center">
-            💡 <strong>{isConfigured ? 'Supabase 연동됨' : '데모 모드'}:</strong> 
-            {isConfigured 
-              ? ' 실제 데이터베이스와 연동되어 있습니다. 로그인이 필요합니다.'
-              : ' 모든 데이터는 테스트용이며, 24시간 후 자동 초기화됩니다. 언제든지 역할을 전환하여 다른 관점에서 체험할 수 있습니다.'}
-          </p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="col-span-2 mt-8 p-4 bg-yellow-50/95 backdrop-blur-sm border border-yellow-200 rounded-lg shadow-lg"
+          >
+            <p className="text-sm text-yellow-800 text-center">
+              💡 <strong>{isConfigured ? 'Supabase 연동됨' : '데모 모드'}:</strong> 
+              {isConfigured 
+                ? ' 실제 데이터베이스와 연동되어 있습니다. 로그인이 필요합니다.'
+                : ' 모든 데이터는 테스트용이며, 24시간 후 자동 초기화됩니다. 언제든지 역할을 전환하여 다른 관점에서 체험할 수 있습니다.'}
+            </p>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   )
 }
