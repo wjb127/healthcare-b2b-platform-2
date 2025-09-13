@@ -206,11 +206,10 @@ export default function BuyerDashboard() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  auth.signOut()
                   router.push('/demo')
                 }}
               >
-                로그아웃
+                역할 전환
               </Button>
             </div>
           </div>
