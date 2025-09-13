@@ -180,7 +180,7 @@ export default function LoginPage() {
           {/* Supplier Selection - Only show when supplier role is selected */}
           {role === 'supplier' && (
             <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm font-medium text-blue-900 mb-3">공급자 선택</p>
+              <p className="text-sm font-medium text-blue-900 mb-3">테스트 계정 선택</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -194,9 +194,12 @@ export default function LoginPage() {
                   <div className={`text-sm font-medium ${
                     selectedSupplier === 1 ? 'text-blue-900' : 'text-gray-600'
                   }`}>
-                    메디칼솔루션(주)
+                    테스트 계정 1
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
+                    메디칼솔루션(주)
+                  </div>
+                  <div className="text-xs text-gray-400">
                     supplier@demo.com
                   </div>
                 </button>
@@ -213,9 +216,12 @@ export default function LoginPage() {
                   <div className={`text-sm font-medium ${
                     selectedSupplier === 2 ? 'text-blue-900' : 'text-gray-600'
                   }`}>
-                    바이오메드(주)
+                    테스트 계정 2
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
+                    바이오메드(주)
+                  </div>
+                  <div className="text-xs text-gray-400">
                     supplier2@demo.com
                   </div>
                 </button>
