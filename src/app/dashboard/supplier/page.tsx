@@ -65,10 +65,10 @@ export default function SupplierDashboard() {
       const demoUser = JSON.parse(demoUserStr)
       setUser({
         id: demoUser.id,
-        email: demoUser.email,
-        role: demoUser.user_metadata.role,
-        company_name: demoUser.user_metadata.company_name,
-        contact_name: demoUser.user_metadata.name
+        email: demoUser.email || '',
+        role: demoUser.role || 'supplier',
+        company_name: demoUser.company_name || '공급업체',
+        contact_name: demoUser.contact_name || '담당자'
       })
       
       // Create sample projects for supplier to see
