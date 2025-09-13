@@ -2,24 +2,24 @@
 -- This script populates the database with realistic sample data
 
 -- Insert test users (buyers and suppliers)
-INSERT INTO users (email, auth_id, role, company_name, contact_name, phone, is_demo, is_verified, created_at) VALUES
+INSERT INTO users (email, auth_id, role, company_name, contact_name, created_at) VALUES
 -- Buyers (Hospitals)
-('buyer1@snu.ac.kr', 'auth_buyer_1', 'buyer', '서울대학교병원', '김병원', '02-2072-2114', false, true, NOW() - INTERVAL '3 months'),
-('buyer2@samsung.com', 'auth_buyer_2', 'buyer', '삼성서울병원', '이의료', '02-3410-2114', false, true, NOW() - INTERVAL '2 months'),
-('buyer3@yuhs.ac', 'auth_buyer_3', 'buyer', '연세세브란스병원', '박건강', '02-2228-1000', false, true, NOW() - INTERVAL '6 months'),
-('buyer4@amc.seoul.kr', 'auth_buyer_4', 'buyer', '서울아산병원', '최진료', '02-3010-3114', false, true, NOW() - INTERVAL '4 months'),
-('buyer5@catholic.ac.kr', 'auth_buyer_5', 'buyer', '가톨릭대학교병원', '정의학', '02-2258-5000', false, true, NOW() - INTERVAL '5 months'),
+('buyer1@snu.ac.kr', 'auth_buyer_1', 'buyer', '서울대학교병원', '김병원', NOW() - INTERVAL '3 months'),
+('buyer2@samsung.com', 'auth_buyer_2', 'buyer', '삼성서울병원', '이의료', NOW() - INTERVAL '2 months'),
+('buyer3@yuhs.ac', 'auth_buyer_3', 'buyer', '연세세브란스병원', '박건강', NOW() - INTERVAL '6 months'),
+('buyer4@amc.seoul.kr', 'auth_buyer_4', 'buyer', '서울아산병원', '최진료', NOW() - INTERVAL '4 months'),
+('buyer5@catholic.ac.kr', 'auth_buyer_5', 'buyer', '가톨릭대학교병원', '정의학', NOW() - INTERVAL '5 months'),
 
 -- Suppliers (Medical Equipment Companies)
-('supplier1@medtech.kr', 'auth_supplier_1', 'supplier', '메디칼솔루션(주)', '강기술', '02-555-1234', false, true, NOW() - INTERVAL '7 months'),
-('supplier2@biomedical.co.kr', 'auth_supplier_2', 'supplier', '바이오메디칼(주)', '윤장비', '02-556-5678', false, true, NOW() - INTERVAL '8 months'),
-('supplier3@healthtech.kr', 'auth_supplier_3', 'supplier', '헬스테크코리아', '조의료', '02-557-9012', false, true, NOW() - INTERVAL '4 months'),
-('supplier4@diagnostic.kr', 'auth_supplier_4', 'supplier', '진단기기전문(주)', '장진단', '02-558-3456', false, true, NOW() - INTERVAL '6 months'),
-('supplier5@surgical.co.kr', 'auth_supplier_5', 'supplier', '수술장비코리아', '신수술', '02-559-7890', false, true, NOW() - INTERVAL '9 months'),
+('supplier1@medtech.kr', 'auth_supplier_1', 'supplier', '메디칼솔루션(주)', '강기술', NOW() - INTERVAL '7 months'),
+('supplier2@biomedical.co.kr', 'auth_supplier_2', 'supplier', '바이오메디칼(주)', '윤장비', NOW() - INTERVAL '8 months'),
+('supplier3@healthtech.kr', 'auth_supplier_3', 'supplier', '헬스테크코리아', '조의료', NOW() - INTERVAL '4 months'),
+('supplier4@diagnostic.kr', 'auth_supplier_4', 'supplier', '진단기기전문(주)', '장진단', NOW() - INTERVAL '6 months'),
+('supplier5@surgical.co.kr', 'auth_supplier_5', 'supplier', '수술장비코리아', '신수술', NOW() - INTERVAL '9 months'),
 
 -- Test accounts for demonstration
-('buyer@demo.com', 'auth_demo_buyer', 'buyer', '데모병원', '테스트구매자', '02-1111-1111', true, true, NOW()),
-('supplier@demo.com', 'auth_demo_supplier', 'supplier', '데모공급사', '테스트공급자', '02-2222-2222', true, true, NOW());
+('buyer@demo.com', 'auth_demo_buyer', 'buyer', '데모병원', '테스트구매자', NOW()),
+('supplier@demo.com', 'auth_demo_supplier', 'supplier', '데모공급사', '테스트공급자', NOW());
 
 -- Insert projects (medical equipment procurement requests)
 INSERT INTO projects (title, category, budget_range, deadline, status, requirements, region, user_id) VALUES
