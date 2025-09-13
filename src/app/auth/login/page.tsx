@@ -136,11 +136,22 @@ export default function LoginPage() {
         </div>
 
         <Card className="p-8">
+          {/* Test Account Notice */}
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-xs text-yellow-800">
+              💡 테스트 계정이 자동으로 입력됩니다. 역할 선택 후 바로 로그인하세요.
+            </p>
+          </div>
+
           {/* Role Selection */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <button
               type="button"
-              onClick={() => setRole('buyer')}
+              onClick={() => {
+                setRole('buyer')
+                setSignInEmail('buyer@demo.com')
+                setSignInPassword('demo1234')
+              }}
               className={`p-3 rounded-lg border-2 transition-all ${
                 role === 'buyer' 
                   ? 'border-teal-500 bg-teal-50' 
@@ -159,7 +170,12 @@ export default function LoginPage() {
 
             <button
               type="button"
-              onClick={() => setRole('supplier')}
+              onClick={() => {
+                setRole('supplier')
+                // Don't fill yet - wait for supplier selection
+                setSignInEmail('')
+                setSignInPassword('')
+              }}
               className={`p-3 rounded-lg border-2 transition-all ${
                 role === 'supplier' 
                   ? 'border-blue-500 bg-blue-50' 
@@ -184,7 +200,11 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setSelectedSupplier(1)}
+                  onClick={() => {
+                    setSelectedSupplier(1)
+                    setSignInEmail('supplier@demo.com')
+                    setSignInPassword('demo1234')
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     selectedSupplier === 1
                       ? 'border-blue-500 bg-white'
@@ -206,7 +226,11 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  onClick={() => setSelectedSupplier(2)}
+                  onClick={() => {
+                    setSelectedSupplier(2)
+                    setSignInEmail('supplier2@demo.com')
+                    setSignInPassword('demo1234')
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     selectedSupplier === 2
                       ? 'border-blue-500 bg-white'
@@ -271,22 +295,6 @@ export default function LoginPage() {
                   '로그인'
                 )}
               </Button>
-
-              <button
-                type="button"
-                onClick={fillTestAccount}
-                className="w-full p-2 text-sm text-gray-600 hover:bg-gray-50 rounded border border-gray-200"
-              >
-                🔑 테스트 계정 자동입력
-                <div className="text-xs text-gray-500 mt-1">
-                  {role === 'buyer' 
-                    ? 'buyer@demo.com' 
-                    : selectedSupplier === 1 
-                      ? 'supplier@demo.com' 
-                      : 'supplier2@demo.com'
-                  } / demo1234
-                </div>
-              </button>
             </div>
           </form>
 
