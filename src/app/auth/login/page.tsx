@@ -29,7 +29,35 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      // 실제 Supabase 로그인 시도
+      // 테스트 계정 먼저 확인
+      const testAccounts = {
+        buyer: { email: 'buyer@demo.com', password: 'demo1234' },
+        supplier: { email: 'supplier@demo.com', password: 'demo1234' }
+      }
+      
+      if (signInEmail === testAccounts[role].email && 
+          signInPassword === testAccounts[role].password) {
+        // 테스트 계정으로 로그인
+        localStorage.setItem('auth_mode', 'demo')
+        localStorage.setItem('demo_role', role)
+        localStorage.setItem('user_role', role)
+        localStorage.setItem('user_email', signInEmail)
+        
+        // 테스트 계정용 데모 사용자 생성
+        const demoUser = {
+          id: `demo-${role}-${Date.now()}`,
+          email: signInEmail,
+          role: role,
+          company_name: role === 'buyer' ? '테스트병원' : '테스트공급사',
+          contact_name: role === 'buyer' ? '김구매' : '이공급'
+        }
+        localStorage.setItem('demo_user', JSON.stringify(demoUser))
+        
+        router.push(`/dashboard/${role}`)
+        return
+      }
+      
+      // 테스트 계정이 아니면 실제 Supabase 로그인 시도
       try {
         const result = await auth.signIn(signInEmail, signInPassword)
         if (result) {
@@ -39,21 +67,7 @@ export default function LoginPage() {
           router.push(`/dashboard/${role}`)
         }
       } catch (supabaseError: any) {
-        // Supabase 로그인 실패 시 테스트 계정 확인
-        const testAccounts = {
-          buyer: { email: 'buyer@demo.com', password: 'demo1234' },
-          supplier: { email: 'supplier@demo.com', password: 'demo1234' }
-        }
-        
-        if (signInEmail === testAccounts[role].email && 
-            signInPassword === testAccounts[role].password) {
-          localStorage.setItem('auth_mode', 'production')
-          localStorage.setItem('user_role', role)
-          localStorage.setItem('user_email', signInEmail)
-          router.push(`/dashboard/${role}`)
-        } else {
-          setError(supabaseError.message || '로그인에 실패했습니다. 테스트 계정: ' + testAccounts[role].email)
-        }
+        setError(supabaseError.message || '로그인에 실패했습니다.')
       }
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다.')
@@ -181,9 +195,12 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={fillTestAccount}
-                className="w-full p-2 text-sm text-gray-600 hover:bg-gray-50 rounded"
+                className="w-full p-2 text-sm text-gray-600 hover:bg-gray-50 rounded border border-gray-200"
               >
                 🔑 테스트 계정 자동입력
+                <div className="text-xs text-gray-500 mt-1">
+                  {role === 'buyer' ? 'buyer@demo.com' : 'supplier@demo.com'} / demo1234
+                </div>
               </button>
             </div>
           </form>
